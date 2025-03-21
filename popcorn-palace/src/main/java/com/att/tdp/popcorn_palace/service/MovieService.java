@@ -3,7 +3,7 @@ package com.att.tdp.popcorn_palace.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
+import com.att.tdp.exception.MovieNotFoundException;
 
 import com.att.tdp.popcorn_palace.model.Movie;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
@@ -29,23 +29,42 @@ public class MovieService {
     } 
 
     public Movie updateMovie(String title,Movie updatedMovie){
-        validateMovie(updatedMovie);
-        Movie existingMovie=movieRepository.findByTitle(title).orElseThrow(()-> new RuntimeException("Movie with this title does not exist"));
-        Optional <Movie> movieWithNewTitle=movieRepository.findByTitle(updatedMovie.getTitle());
-        if(movieWithNewTitle.isPresent()&& !movieWithNewTitle.get().getId().equals(existingMovie.getId())){
-            throw new RuntimeException("The updated title is already taken");
+        Movie existingMovie=movieRepository.findByTitle(title).orElseThrow(()-> new MovieNotFoundException("There is no movie with the given title '"+title+"'"));
+        if(updatedMovie.getTitle()!=null && updatedMovie.getTitle().trim().isEmpty()){
+            throw new IllegalArgumentException("Title is required and can't be empty");
         }
-        existingMovie.setTitle(updatedMovie.getTitle());
-        existingMovie.setGenre(updatedMovie.getGenre());
-        existingMovie.setDuration(updatedMovie.getDuration());
-        existingMovie.setRating(updatedMovie.getRating());
-        existingMovie.setReleaseYear(updatedMovie.getReleaseYear());
-
+        if (updatedMovie.getTitle() != null && !updatedMovie.getTitle().trim().isEmpty()) {
+            Optional<Movie> movieWithNewTitle = movieRepository.findByTitle(updatedMovie.getTitle());
+            if (movieWithNewTitle.isPresent() && !movieWithNewTitle.get().getId().equals(existingMovie.getId())) {
+                throw new RuntimeException("The updated title is already taken");
+            }
+            existingMovie.setTitle(updatedMovie.getTitle());
+        }
+    
+        if (updatedMovie.getGenre() != null && !updatedMovie.getGenre().trim().isEmpty()) {
+            if (updatedMovie.getGenre().matches(".*\\d.*")) {
+                throw new IllegalArgumentException("Genre can't contain numbers");
+            }
+            existingMovie.setGenre(updatedMovie.getGenre());
+        }
+    
+        if (updatedMovie.getDuration() != null && updatedMovie.getDuration() > 0) {
+            existingMovie.setDuration(updatedMovie.getDuration());
+        }
+    
+        if (updatedMovie.getRating() != null && updatedMovie.getRating() >= 0) {
+            existingMovie.setRating(updatedMovie.getRating());
+        }
+    
+        if (updatedMovie.getReleaseYear() != null && updatedMovie.getReleaseYear() > 0) {
+            existingMovie.setReleaseYear(updatedMovie.getReleaseYear());
+        }
+    
         return movieRepository.save(existingMovie);
     }
 
     public void deleteMovieByTitle(String title){
-        Movie movie=movieRepository.findByTitle(title).orElseThrow(()->new RuntimeException("There is no movie with the given title'"+title+"'"));
+        Movie movie=movieRepository.findByTitle(title).orElseThrow(()->new MovieNotFoundException("There is no movie with the given title '"+title+"'"));
         movieRepository.delete(movie);
     }
 
@@ -56,14 +75,17 @@ public class MovieService {
         if(movie.getGenre()==null||movie.getGenre().trim().isEmpty()){
             throw new IllegalArgumentException("Genre is required and can't be empty");
         }
-        if(movie.getDuration()<=0){
+        if(movie.getGenre().matches(".*\\d.*")){
+            throw new IllegalArgumentException("Genre can't contain numbers");
+        }
+        if(movie.getDuration()==null||movie.getDuration()<=0){
             throw new IllegalArgumentException("Duration must be greater than 0");
         }
-        if(movie.getRating()<0||movie.getRating()>10){
-            throw new IllegalArgumentException("Rating must be between 0 and 10");
+        if(movie.getRating()<0){
+            throw new IllegalArgumentException("Rating must be greater than 0");
         }
-        if(movie.getReleaseYear()<1900||movie.getReleaseYear()>2022){
-            throw new IllegalArgumentException("Release year must be between 1900 and 2022");
+        if(movie.getReleaseYear()==null||movie.getReleaseYear()<0){
+            throw new IllegalArgumentException("Release year is required and must be greater than 0");
         }
     }
 

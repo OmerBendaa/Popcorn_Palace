@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 @Getter
 @Setter
 @Entity
+
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,9 +19,8 @@ public class Movie {
 
     @Column(nullable=false,unique=true)
     private String title;
-    
     private String genre;
-    private int duration;
-    private float rating;
-    private int releaseYear;
+    private Integer duration;
+    private Double rating;
+    private Integer releaseYear;
 }

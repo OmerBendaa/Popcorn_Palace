@@ -1,6 +1,7 @@
 package com.att.tdp.popcorn_palace.controller;
 import org.springframework.web.bind.annotation.RestController;
 import com.att.tdp.popcorn_palace.service.MovieService;
+import com.att.tdp.exception.MovieNotFoundException;
 import com.att.tdp.popcorn_palace.model.Movie;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +29,31 @@ public class MovieController {
     public ResponseEntity<?> addMovie(@RequestBody Movie movie){
         try{
             return new ResponseEntity<>(movieService.addMovie(movie),HttpStatus.CREATED);
+        }catch(IllegalArgumentException error){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.getMessage());
         }catch(RuntimeException error){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.getMessage());
         }
     }
 
     @PostMapping("/update/{movieTitle}")
-    public ResponseEntity<?> updateMovie(@PathVariable String title,@RequestBody Movie updatedMovie){
+    public ResponseEntity<?> updateMovie(@PathVariable String movieTitle,@RequestBody Movie updatedMovie){
         try{
-            return ResponseEntity.ok(movieService.updateMovie(title, updatedMovie));
+            return ResponseEntity.ok(movieService.updateMovie(movieTitle, updatedMovie));
+        }catch(IllegalArgumentException error){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.getMessage());
         }catch(RuntimeException error){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error.getMessage());
         }
     }
 
     @DeleteMapping("/{movieTitle}")
-    public ResponseEntity<Void> deleteMovie(@PathVariable String title){
+    public ResponseEntity<Void> deleteMovie(@PathVariable String movieTitle){
         try{
-            movieService.deleteMovieByTitle(title);
+            movieService.deleteMovieByTitle(movieTitle);
             return ResponseEntity.noContent().build();
-        }catch(RuntimeException error){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }catch(MovieNotFoundException error){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
