@@ -3,8 +3,7 @@ package com.att.tdp.popcorn_palace.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import com.att.tdp.exception.MovieNotFoundException;
-
+import com.att.tdp.popcorn_palace.exception.NotFoundException;
 import com.att.tdp.popcorn_palace.model.Movie;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
 import java.util.List;
@@ -24,12 +23,12 @@ public class MovieService {
         try{ 
             return movieRepository.save(movie);
         }catch(DataIntegrityViolationException error){
-            throw new RuntimeException("A movie with this title already exists");
+            throw new DataIntegrityViolationException("A movie with this title already exists");
         }
     } 
 
     public Movie updateMovie(String title,Movie updatedMovie){
-        Movie existingMovie=movieRepository.findByTitle(title).orElseThrow(()-> new MovieNotFoundException("There is no movie with the given title '"+title+"'"));
+        Movie existingMovie=movieRepository.findByTitle(title).orElseThrow(()-> new NotFoundException("There is no movie with the given title '"+title+"'"));
         if(updatedMovie.getTitle()!=null && updatedMovie.getTitle().trim().isEmpty()){
             throw new IllegalArgumentException("Title is required and can't be empty");
         }
@@ -64,7 +63,7 @@ public class MovieService {
     }
 
     public void deleteMovieByTitle(String title){
-        Movie movie=movieRepository.findByTitle(title).orElseThrow(()->new MovieNotFoundException("There is no movie with the given title '"+title+"'"));
+        Movie movie=movieRepository.findByTitle(title).orElseThrow(()->new NotFoundException("There is no movie with the given title '"+title+"'"));
         movieRepository.delete(movie);
     }
 
