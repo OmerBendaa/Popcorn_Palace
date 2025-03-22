@@ -1,7 +1,6 @@
 package com.att.tdp.popcorn_palace.controller;
 import org.springframework.web.bind.annotation.RestController;
 import com.att.tdp.popcorn_palace.service.MovieService;
-import com.att.tdp.popcorn_palace.exception.NotFoundException;
 import com.att.tdp.popcorn_palace.model.Movie;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
