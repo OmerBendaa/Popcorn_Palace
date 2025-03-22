@@ -30,8 +30,8 @@ public class ShowTimeController {
     }
 
     @PostMapping("/update/{showtimeId}")
-    public ResponseEntity<?> updateShowTime(@PathVariable Long showTimeId,@RequestBody ShowTime updatedShowTime){
-            return ResponseEntity.ok(showTimeService.updateShowTime(showTimeId, updatedShowTime));
+    public ResponseEntity<?> updateShowTime(@PathVariable Long showtimeId,@RequestBody ShowTime updatedShowTime){
+            return ResponseEntity.ok(showTimeService.updateShowTime(showtimeId, updatedShowTime));
 
     }
 

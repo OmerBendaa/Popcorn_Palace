@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import com.att.tdp.popcorn_palace.exception.NotFoundException;
+import com.att.tdp.popcorn_palace.model.Movie;
 import com.att.tdp.popcorn_palace.model.ShowTime;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
@@ -37,6 +38,10 @@ public class ShowTimeService {
                 throw new DataIntegrityViolationException("The showTime you are trying to add overlaps with an existing showTime");
             }
             try{
+                Optional<Movie>existingMovie=movieRepository.findById(showTime.getMovieId());
+                if(!existingMovie.isPresent()){
+                    throw new NotFoundException("There is no movie with the given id");
+                }
                 return showTimeRepository.save(showTime);
             }catch(DataIntegrityViolationException error){
                 throw new DataIntegrityViolationException("A showtime with this id already exists");
