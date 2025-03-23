@@ -1,6 +1,8 @@
 package com.att.tdp.popcorn_palace.exception;
 import com.att.tdp.popcorn_palace.model.ErrorResponse;
 
+import java.time.format.DateTimeParseException;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,11 @@ public class ErrorHandler {
     }
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException error) {
+        ErrorResponse errorResponse = new ErrorResponse(error.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ErrorResponse> handleDateTimeParseException(DataIntegrityViolationException error) {
         ErrorResponse errorResponse = new ErrorResponse(error.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
