@@ -25,7 +25,7 @@ public class ShowTimeController {
         return ResponseEntity.ok(showTimeService.getAllShowTimes());
     }
     @GetMapping("/{showtimeId}")
-    public ResponseEntity<Optional<ShowTime>> getShowTimeById(@PathVariable Long showtimeId){
+    public ResponseEntity<ShowTime> getShowTimeById(@PathVariable Long showtimeId){
         return ResponseEntity.ok(showTimeService.getShowTimeById(showtimeId));
     }
 
@@ -35,9 +35,9 @@ public class ShowTimeController {
     }
 
     @PostMapping("/update/{showtimeId}")
-    public ResponseEntity<?> updateShowTime(@PathVariable Long showtimeId,@RequestBody ShowTime updatedShowTime){
-            return ResponseEntity.ok(showTimeService.updateShowTime(showtimeId, updatedShowTime));
-
+    public ResponseEntity<Void> updateShowTime(@PathVariable Long showtimeId, @RequestBody ShowTime updatedShowTime){
+        showTimeService.updateShowTime(showtimeId, updatedShowTime);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{showtimeId}")

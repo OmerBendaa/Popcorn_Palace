@@ -24,13 +24,9 @@ public class ShowTimeService {
     public List<ShowTime> getAllShowTimes(){
         return showTimeRepository.findAll();
     }
-    public Optional<ShowTime> getShowTimeById(Long showtimeId){
-        try{ 
-            return showTimeRepository.findById(showtimeId);
-        }catch(NotFoundException error){
-            throw new NotFoundException("There is no showtime with the given id");
-        }
-       
+    public ShowTime getShowTimeById(Long showtimeId){
+        return showTimeRepository.findById(showtimeId)
+                .orElseThrow(() -> new NotFoundException("There is no showtime with the given id: " + showtimeId));
     }
 
     public ShowTime addShowTime(ShowTime showTime){
@@ -40,18 +36,15 @@ public class ShowTimeService {
             if (!overlappingShowTimes.isEmpty()) {
                 throw new DataIntegrityViolationException("The showTime you are trying to add overlaps with an existing showTime");
             }
-            try{
                 Optional<Movie>existingMovie=movieRepository.findById(showTime.getMovieId());
                 if(!existingMovie.isPresent()){
                     throw new NotFoundException("There is no movie with the given id");
                 }
                 return showTimeRepository.save(showTime);
-            }catch(DataIntegrityViolationException error){
-                throw new DataIntegrityViolationException("A showtime with this id already exists");
-            }
+            
     } 
 
-    public ShowTime updateShowTime(Long showTimeId, ShowTime updatedShowTime) {
+    public void updateShowTime(Long showTimeId, ShowTime updatedShowTime) {
         ShowTime existingShowTime = showTimeRepository.findById(showTimeId)
                 .orElseThrow(() -> new NotFoundException("There is no showTime with the given Id '" + showTimeId + "'"));
 
@@ -68,7 +61,6 @@ public class ShowTimeService {
         if (updatedShowTime.getTheater() != null && !updatedShowTime.getTheater().trim().isEmpty()) {
             existingShowTime.setTheater(updatedShowTime.getTheater());
         }
-
         if (updatedShowTime.getStartTime() != null&& !updatedShowTime.getStartTime().toString().trim().isEmpty()) {
             validateInstantFormat(updatedShowTime.getStartTime());
             existingShowTime.setStartTime(updatedShowTime.getStartTime());
@@ -82,14 +74,16 @@ public class ShowTimeService {
         if (updatedShowTime.getPrice() != null && updatedShowTime.getPrice() > 0) {
             existingShowTime.setPrice(updatedShowTime.getPrice());
         }
-
+        if(existingShowTime.getStartTime().isAfter(existingShowTime.getEndTime())){
+            throw new IllegalArgumentException("startTime must be earlier than endTime");
+        }
         List<ShowTime> overlappingShowTimes = showTimeRepository.findOverlappingShowTimes(
                 existingShowTime.getTheater(), existingShowTime.getStartTime(), existingShowTime.getEndTime());
         if (!overlappingShowTimes.isEmpty() && overlappingShowTimes.stream().anyMatch(s -> !s.getId().equals(showTimeId))) {
             throw new DataIntegrityViolationException("The updated showTime overlaps with an existing showTime");
         }
 
-        return showTimeRepository.save(existingShowTime);
+        showTimeRepository.save(existingShowTime);
     }
 
     public void deleteShowTimeById(Long showTimeId){
