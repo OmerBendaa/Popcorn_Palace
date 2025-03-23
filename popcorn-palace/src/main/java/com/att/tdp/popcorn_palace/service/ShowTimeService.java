@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import com.att.tdp.popcorn_palace.exception.NotFoundException;
+import com.att.tdp.popcorn_palace.model.Booking;
 import com.att.tdp.popcorn_palace.model.Movie;
 import com.att.tdp.popcorn_palace.model.ShowTime;
+import com.att.tdp.popcorn_palace.repository.IBookingRepository;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
 
@@ -20,6 +22,8 @@ public class ShowTimeService {
     private IShowTimeRepository showTimeRepository;
     @Autowired
     private IMovieRepository movieRepository;
+    @Autowired
+    private IBookingRepository bookingRepository;
     
     public List<ShowTime> getAllShowTimes(){
         return showTimeRepository.findAll();
@@ -88,6 +92,8 @@ public class ShowTimeService {
 
     public void deleteShowTimeById(Long showTimeId){
         ShowTime showTime=showTimeRepository.findById(showTimeId).orElseThrow(()->new NotFoundException("There is no showTime with the given id '"+showTimeId+"'"));
+        List<Booking> showTimeBookings = bookingRepository.findByShowtimeId(showTimeId);
+        bookingRepository.deleteAll(showTimeBookings);
         showTimeRepository.delete(showTime);
     }
 
