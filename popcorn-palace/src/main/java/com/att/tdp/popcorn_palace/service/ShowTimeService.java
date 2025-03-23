@@ -20,7 +20,10 @@ public class ShowTimeService {
     private IShowTimeRepository showTimeRepository;
     @Autowired
     private IMovieRepository movieRepository;
-
+    
+    public List<ShowTime> getAllShowTimes(){
+        return showTimeRepository.findAll();
+    }
     public Optional<ShowTime> getShowTimeById(Long showtimeId){
         try{ 
             return showTimeRepository.findById(showtimeId);

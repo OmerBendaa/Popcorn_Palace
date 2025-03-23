@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.Optional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/showtimes")
@@ -19,6 +20,10 @@ public class ShowTimeController {
     @Autowired
     private ShowTimeService showTimeService;
 
+    @GetMapping("/all")
+    public ResponseEntity<List<ShowTime>> getAllShowTimes(){
+        return ResponseEntity.ok(showTimeService.getAllShowTimes());
+    }
     @GetMapping("/{showtimeId}")
     public ResponseEntity<Optional<ShowTime>> getShowTimeById(@PathVariable Long showtimeId){
         return ResponseEntity.ok(showTimeService.getShowTimeById(showtimeId));
