@@ -11,10 +11,10 @@ import com.att.tdp.popcorn_palace.repository.IBookingRepository;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ShowTimeService {
@@ -40,25 +40,20 @@ public class ShowTimeService {
             if (!overlappingShowTimes.isEmpty()) {
                 throw new DataIntegrityViolationException("The showTime you are trying to add overlaps with an existing showTime");
             }
-                Optional<Movie>existingMovie=movieRepository.findById(showTime.getMovieId());
-                if(!existingMovie.isPresent()){
-                    throw new NotFoundException("There is no movie with the given id");
-                }
                 return showTimeRepository.save(showTime);
-            
     } 
 
     public void updateShowTime(Long showTimeId, ShowTime updatedShowTime) {
+        Movie existingMovie=null;
         ShowTime existingShowTime = showTimeRepository.findById(showTimeId)
                 .orElseThrow(() -> new NotFoundException("There is no showTime with the given Id '" + showTimeId + "'"));
 
         if (updatedShowTime.getMovieId() != null) {
             if (updatedShowTime.getMovieId() <= 0) {
-                throw new IllegalArgumentException("movieId must be a valid id");
+                throw new IllegalArgumentException("movieId must be a valid id - greater than 0");
             }
-            if (!movieRepository.existsById(updatedShowTime.getMovieId())) {
-                throw new NotFoundException("A movie with the given id does not exist");
-            }
+            existingMovie = movieRepository.findById(updatedShowTime.getMovieId())
+                    .orElseThrow(() -> new NotFoundException("There is no movie with the given id '" + updatedShowTime.getMovieId() + "'"));
             existingShowTime.setMovieId(updatedShowTime.getMovieId());
         }
 
@@ -81,6 +76,12 @@ public class ShowTimeService {
         if(existingShowTime.getStartTime().isAfter(existingShowTime.getEndTime())){
             throw new IllegalArgumentException("startTime must be earlier than endTime");
         }
+        if(existingMovie!=null){
+            Duration showTimeDuration = Duration.between(existingShowTime.getStartTime(), existingShowTime.getEndTime());
+            if (showTimeDuration.toMinutes() < existingMovie.getDuration()) {
+                throw new IllegalArgumentException("The duration of a showtime must be equal or greater than the movie's duration");
+            }
+        }
         List<ShowTime> overlappingShowTimes = showTimeRepository.findOverlappingShowTimes(
                 existingShowTime.getTheater(), existingShowTime.getStartTime(), existingShowTime.getEndTime());
         if (!overlappingShowTimes.isEmpty() && overlappingShowTimes.stream().anyMatch(s -> !s.getId().equals(showTimeId))) {
@@ -101,6 +102,7 @@ public class ShowTimeService {
         if (showTime.getMovieId() == null || showTime.getMovieId() <= 0) {
             throw new IllegalArgumentException("movieId is required and must be a valid id");
         }
+        Movie existingMovie = movieRepository.findById(showTime.getMovieId()).orElseThrow(() -> new IllegalArgumentException("Movie with the given id does not exist"));
         if (showTime.getTheater() == null || showTime.getTheater().trim().isEmpty()) {
             throw new IllegalArgumentException("Theater is required and can't be empty");
         }
@@ -117,6 +119,10 @@ public class ShowTimeService {
         }
         if (showTime.getPrice() == null || showTime.getPrice() <= 0) {
             throw new IllegalArgumentException("price is required and must be greater than 0");
+        }
+        Duration showTimeDuration = Duration.between(showTime.getStartTime(), showTime.getEndTime());
+        if (showTimeDuration.toMinutes() < existingMovie.getDuration()) {
+            throw new IllegalArgumentException("The duration of a showtime must be equal or greater than the movie's duration");
         }
         
     }
