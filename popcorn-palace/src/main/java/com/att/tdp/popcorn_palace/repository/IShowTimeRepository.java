@@ -18,5 +18,5 @@ public interface IShowTimeRepository extends JpaRepository<ShowTime,Long> {
     List<ShowTime> findOverlappingShowTimes(@Param("theater") String theater,
                                             @Param("startTime") Instant startTime,
                                             @Param("endTime") Instant endTime);
-
+    List<ShowTime> findByMovieId(Long movieId);
 }

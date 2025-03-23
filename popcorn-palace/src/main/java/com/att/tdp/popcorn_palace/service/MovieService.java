@@ -5,14 +5,21 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import com.att.tdp.popcorn_palace.exception.NotFoundException;
 import com.att.tdp.popcorn_palace.model.Movie;
+import com.att.tdp.popcorn_palace.model.ShowTime;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
+import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
+
 import java.util.List;
 import java.util.Optional;
-
 @Service
 public class MovieService {
+
     @Autowired
     private IMovieRepository movieRepository;
+    @Autowired
+    private IShowTimeRepository showTimeRepository;
+    @Autowired
+    private ShowTimeService showTimeService;
 
     public List<Movie> getAllMovies(){
         return movieRepository.findAll();
@@ -39,7 +46,6 @@ public class MovieService {
             }
             existingMovie.setTitle(updatedMovie.getTitle());
         }
-    
         if (updatedMovie.getGenre() != null && !updatedMovie.getGenre().trim().isEmpty()) {
             if (updatedMovie.getGenre().matches(".*\\d.*")) {
                 throw new IllegalArgumentException("Genre can't contain numbers");
@@ -64,9 +70,13 @@ public class MovieService {
 
     public void deleteMovieByTitle(String title){
         Movie movie=movieRepository.findByTitle(title).orElseThrow(()->new NotFoundException("There is no movie with the given title '"+title+"'"));
+        List<ShowTime> relatedShowTimes = showTimeRepository.findByMovieId(movie.getId());
+        for(ShowTime showTime:relatedShowTimes){
+            showTimeService.deleteShowTimeById(showTime.getId());
+        }
         movieRepository.delete(movie);
-    }
-
+    } 
+    
     private void validateMovie(Movie movie){
         if(movie.getTitle()==null||movie.getTitle().trim().isEmpty()){
             throw new IllegalArgumentException("Title is required and can't be empty");
@@ -87,7 +97,4 @@ public class MovieService {
             throw new IllegalArgumentException("Release year is required and must be greater than 0");
         }
     }
-
-    
-
 }
