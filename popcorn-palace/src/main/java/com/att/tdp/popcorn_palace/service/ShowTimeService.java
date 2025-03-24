@@ -44,7 +44,6 @@ public class ShowTimeService {
     } 
 
     public void updateShowTime(Long showTimeId, ShowTime updatedShowTime) {
-        Movie existingMovie=null;
         ShowTime existingShowTime = showTimeRepository.findById(showTimeId)
                 .orElseThrow(() -> new NotFoundException("There is no showTime with the given Id '" + showTimeId + "'"));
 
@@ -52,10 +51,11 @@ public class ShowTimeService {
             if (updatedShowTime.getMovieId() <= 0) {
                 throw new IllegalArgumentException("movieId must be a valid id - greater than 0");
             }
-            existingMovie = movieRepository.findById(updatedShowTime.getMovieId())
+            Movie existingMovie = movieRepository.findById(updatedShowTime.getMovieId())
                     .orElseThrow(() -> new NotFoundException("There is no movie with the given id '" + updatedShowTime.getMovieId() + "'"));
             existingShowTime.setMovieId(updatedShowTime.getMovieId());
         }
+        Movie updatedMovie=movieRepository.findById(existingShowTime.getMovieId()).orElse(null);
 
         if (updatedShowTime.getTheater() != null && !updatedShowTime.getTheater().trim().isEmpty()) {
             existingShowTime.setTheater(updatedShowTime.getTheater());
@@ -76,9 +76,9 @@ public class ShowTimeService {
         if(existingShowTime.getStartTime().isAfter(existingShowTime.getEndTime())){
             throw new IllegalArgumentException("startTime must be earlier than endTime");
         }
-        if(existingMovie!=null){
+        if(updatedMovie!=null){
             Duration showTimeDuration = Duration.between(existingShowTime.getStartTime(), existingShowTime.getEndTime());
-            if (showTimeDuration.toMinutes() < existingMovie.getDuration()) {
+            if (showTimeDuration.toMinutes() < updatedMovie.getDuration()) {
                 throw new IllegalArgumentException("The duration of a showtime must be equal or greater than the movie's duration");
             }
         }
