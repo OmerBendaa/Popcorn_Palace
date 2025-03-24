@@ -9,6 +9,7 @@ import com.att.tdp.popcorn_palace.model.ShowTime;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -36,8 +37,9 @@ public class MovieService {
 
     public Movie updateMovie(String title,Movie updatedMovie){
         Movie existingMovie=movieRepository.findByTitle(title).orElseThrow(()-> new NotFoundException("There is no movie with the given title '"+title+"'"));
+        Integer existingMovieDuration=existingMovie.getDuration();
         if(updatedMovie.getTitle()!=null && updatedMovie.getTitle().trim().isEmpty()){
-            throw new IllegalArgumentException("Title is required and can't be empty");
+            throw new IllegalArgumentException("Title can't be empty");
         }
         if (updatedMovie.getTitle() != null && !updatedMovie.getTitle().trim().isEmpty()) {
             Optional<Movie> movieWithNewTitle = movieRepository.findByTitle(updatedMovie.getTitle());
@@ -63,6 +65,15 @@ public class MovieService {
     
         if (updatedMovie.getReleaseYear() != null && updatedMovie.getReleaseYear() > 0) {
             existingMovie.setReleaseYear(updatedMovie.getReleaseYear());
+        }
+        if(existingMovieDuration<existingMovie.getDuration()){
+            List<ShowTime> relatedShowTimes = showTimeRepository.findByMovieId(existingMovie.getId());
+            for(ShowTime showTime:relatedShowTimes){
+                 Duration showTimeDuration = Duration.between(showTime.getStartTime(), showTime.getEndTime());
+            if (showTimeDuration.toMinutes() < existingMovie.getDuration()) {
+                throw new IllegalArgumentException("The duration of showtime: "+showTime.getId()+" is too short for the updated movie's duration and needs to be extended");
+            }
+            }
         }
     
         return movieRepository.save(existingMovie);
