@@ -21,28 +21,31 @@ public class ShowTimeController {
 
     @GetMapping("/all")
     public ResponseEntity<List<ShowTime>> getAllShowTimes(){
-        return ResponseEntity.ok(showTimeService.getAllShowTimes());
+        List<ShowTime> showTimes = showTimeService.getAllShowTimes();
+        return ResponseEntity.status(HttpStatus.OK).body(showTimes);
     }
     @GetMapping("/{showtimeId}")
     public ResponseEntity<ShowTime> getShowTimeById(@PathVariable Long showtimeId){
-        return ResponseEntity.ok(showTimeService.getShowTimeById(showtimeId));
+        ShowTime showTime = showTimeService.getShowTimeById(showtimeId);
+        return ResponseEntity.status(HttpStatus.OK).body(showTime);
     }
 
     @PostMapping
-    public ResponseEntity<?> addShowTime(@RequestBody ShowTime showTime){
-            return new ResponseEntity<>(showTimeService.addShowTime(showTime),HttpStatus.CREATED);
+    public ResponseEntity<ShowTime> addShowTime(@RequestBody ShowTime showTime){
+        ShowTime addedShowTime = showTimeService.addShowTime(showTime);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedShowTime);
     }
 
     @PostMapping("/update/{showtimeId}")
     public ResponseEntity<Void> updateShowTime(@PathVariable Long showtimeId, @RequestBody ShowTime updatedShowTime){
         showTimeService.updateShowTime(showtimeId, updatedShowTime);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/{showtimeId}")
     public ResponseEntity<Void> deleteShowTimeById(@PathVariable Long showtimeId){
             showTimeService.deleteShowTimeById(showtimeId);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
 

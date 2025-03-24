@@ -3,11 +3,9 @@ package com.att.tdp.popcorn_palace.service;
 import com.att.tdp.popcorn_palace.model.Booking;
 import com.att.tdp.popcorn_palace.repository.IBookingRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +17,7 @@ public class BookingService {
 
     @Autowired
     private IShowTimeRepository showTimeRepository;
+
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
@@ -31,6 +30,7 @@ public class BookingService {
         }
         return bookingRepository.save(booking);
     }
+
     private void validateBooking(Booking booking) {
         if (booking.getShowtimeId() == null || booking.getShowtimeId() <= 0) {  
             throw new IllegalArgumentException("Showtime ID is required and must be a valid number greater than 0");
@@ -50,5 +50,4 @@ public class BookingService {
             throw new IllegalArgumentException("User ID must be a valid UUID");
         }
     }
-
 }

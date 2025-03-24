@@ -28,6 +28,7 @@ public class ShowTimeService {
     public List<ShowTime> getAllShowTimes(){
         return showTimeRepository.findAll();
     }
+    
     public ShowTime getShowTimeById(Long showtimeId){
         return showTimeRepository.findById(showtimeId)
                 .orElseThrow(() -> new NotFoundException("There is no showtime with the given id: " + showtimeId));
