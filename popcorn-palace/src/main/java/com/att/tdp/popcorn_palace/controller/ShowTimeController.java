@@ -21,11 +21,13 @@ public class ShowTimeController {
 
     @GetMapping("/all")
     public ResponseEntity<List<ShowTime>> getAllShowTimes(){
-        return ResponseEntity.ok(showTimeService.getAllShowTimes());
+        List<ShowTime> showTimes = showTimeService.getAllShowTimes();
+        return ResponseEntity.status(HttpStatus.OK).body(showTimes);
     }
     @GetMapping("/{showtimeId}")
     public ResponseEntity<ShowTime> getShowTimeById(@PathVariable Long showtimeId){
-        return ResponseEntity.ok(showTimeService.getShowTimeById(showtimeId));
+        ShowTime showTime = showTimeService.getShowTimeById(showtimeId);
+        return ResponseEntity.status(HttpStatus.OK).body(showTime);
     }
 
     @PostMapping
