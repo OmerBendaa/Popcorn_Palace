@@ -52,7 +52,7 @@ public class ShowTimeService {
             if (updatedShowTime.getMovieId() <= 0) {
                 throw new IllegalArgumentException("movieId must be a valid id - greater than 0");
             }
-            Movie existingMovie = movieRepository.findById(updatedShowTime.getMovieId())
+            movieRepository.findById(updatedShowTime.getMovieId())
                     .orElseThrow(() -> new NotFoundException("There is no movie with the given id '" + updatedShowTime.getMovieId() + "'"));
             existingShowTime.setMovieId(updatedShowTime.getMovieId());
         }
