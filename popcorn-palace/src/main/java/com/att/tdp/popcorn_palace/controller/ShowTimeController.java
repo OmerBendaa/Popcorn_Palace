@@ -31,20 +31,21 @@ public class ShowTimeController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addShowTime(@RequestBody ShowTime showTime){
-            return new ResponseEntity<>(showTimeService.addShowTime(showTime),HttpStatus.CREATED);
+    public ResponseEntity<ShowTime> addShowTime(@RequestBody ShowTime showTime){
+        ShowTime addedShowTime = showTimeService.addShowTime(showTime);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedShowTime);
     }
 
     @PostMapping("/update/{showtimeId}")
     public ResponseEntity<Void> updateShowTime(@PathVariable Long showtimeId, @RequestBody ShowTime updatedShowTime){
         showTimeService.updateShowTime(showtimeId, updatedShowTime);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/{showtimeId}")
     public ResponseEntity<Void> deleteShowTimeById(@PathVariable Long showtimeId){
             showTimeService.deleteShowTimeById(showtimeId);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
 
