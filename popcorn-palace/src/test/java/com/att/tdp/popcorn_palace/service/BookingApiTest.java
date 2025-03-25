@@ -66,7 +66,6 @@ class BookingApiTest {
         booking.setSeatNumber(3);
         booking.setUserId(UUID.randomUUID().toString());
 
-        // Mock the repository methods
         when(movieRepository.save(movie)).thenReturn(movie);
         when(showTimeRepository.save(showTime)).thenReturn(showTime);
         when(bookingRepository.save(booking)).thenReturn(booking);
@@ -83,7 +82,6 @@ class BookingApiTest {
         booking.setUserId(UUID.randomUUID().toString());
         booking.setShowtimeId(1L);
         booking.setSeatNumber(5);
-        Booking createdBooking= bookingRepository.save(booking);
         List<Booking> bookings = Arrays.asList(booking);
         when(bookingRepository.findAll()).thenReturn(bookings);
         List<Booking> result = bookingService.getAllBookings();
@@ -92,7 +90,7 @@ class BookingApiTest {
     }
 
     @Test
-    void createBookingWithNonExistingShowtimeId() {
+    void createBookingWithNonExistingShowtimeIdTest() {
         Booking newBooking = new Booking();
         newBooking.setShowtimeId(999L);
         newBooking.setSeatNumber(5);
@@ -108,7 +106,7 @@ class BookingApiTest {
     }
 
     @Test
-    void createBookingWithNoShowTimeId() {
+    void createBookingWithNoShowTimeIdTest() {
         Booking newBooking = new Booking();
         newBooking.setSeatNumber(5);
         newBooking.setUserId(UUID.randomUUID().toString());
@@ -123,7 +121,7 @@ class BookingApiTest {
     }
     
     @Test
-    void createBookingWithNegativeShowTimeId() {
+    void createBookingWithNegativeShowTimeIdTest() {
         Booking newBooking = new Booking();
         newBooking.setShowtimeId(-5L);
         newBooking.setSeatNumber(5);
@@ -139,7 +137,7 @@ class BookingApiTest {
     }
     
     @Test
-    void createBookingWithAlreadySelectedSeat() {
+    void createBookingWithAlreadySelectedSeatTest() {
         Booking newBooking = new Booking();
         newBooking.setShowtimeId(1L);
         newBooking.setSeatNumber(3);
@@ -154,7 +152,7 @@ class BookingApiTest {
     }
 
     @Test
-    void createBookingWithNoSeatNumber() {
+    void createBookingWithNoSeatNumberTest() {
         Booking newBooking = new Booking();
         newBooking.setShowtimeId(1L);
         newBooking.setUserId(UUID.randomUUID().toString());
@@ -169,7 +167,7 @@ class BookingApiTest {
     }
 
     @Test
-    void createBookingWithNegativeSeatNumber() {
+    void createBookingWithNegativeSeatNumberTest() {
         Booking newBooking = new Booking();
         newBooking.setShowtimeId(1L);
         newBooking.setSeatNumber(-5);
@@ -185,7 +183,7 @@ class BookingApiTest {
     }
 
     @Test
-    void createBookingWithNoUserId() {
+    void createBookingWithNoUserIdTest() {
         Booking newBooking = new Booking();
         newBooking.setShowtimeId(1L);
         newBooking.setSeatNumber(5);
@@ -200,7 +198,7 @@ class BookingApiTest {
     }
 
     @Test
-    void createBookingWithEmptyUserId() {
+    void createBookingWithEmptyUserIdTest() {
         Booking newBooking = new Booking();
         newBooking.setShowtimeId(1L);
         newBooking.setSeatNumber(5);
