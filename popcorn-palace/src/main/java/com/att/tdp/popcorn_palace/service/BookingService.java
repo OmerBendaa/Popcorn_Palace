@@ -36,10 +36,7 @@ public class BookingService {
         if (booking.getShowtimeId() == null || booking.getShowtimeId() <= 0) {
             throw new IllegalArgumentException("Showtime ID is required and must be a valid number greater than 0");
         }
-        if (!showTimeRepository.existsById(booking.getShowtimeId())) {
-            throw new IllegalArgumentException(
-                    "There is no showtime with the given showtimeId: " + booking.getShowtimeId());
-        }
+        
         if (booking.getSeatNumber() == null || booking.getSeatNumber() <= 0) {
             throw new IllegalArgumentException("Seat number is required and must be greater than 0");
         }
@@ -48,6 +45,10 @@ public class BookingService {
         }
         if (!showTimeRepository.existsById(booking.getShowtimeId())) {
             throw new IllegalArgumentException("There is no showtime with the given showtimeId: " + booking.getShowtimeId());
+        }
+        if (!showTimeRepository.existsById(booking.getShowtimeId())) {
+            throw new IllegalArgumentException(
+                    "There is no showtime with the given showtimeId: " + booking.getShowtimeId());
         }
         try {
             UUID.fromString(booking.getUserId());

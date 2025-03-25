@@ -105,13 +105,13 @@ class MovieApiTest {
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
+
         when(movieRepository.save(newMovie)).thenReturn(newMovie);
-    
+
         Movie savedMovie = movieService.addMovie(newMovie);
-    
+
         verify(movieRepository, times(1)).save(newMovie);
-    
+
         assertEquals(newMovie, savedMovie);
     }
 
@@ -119,20 +119,22 @@ class MovieApiTest {
     void addMovieFailTitleAlreadyExistsTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Avengers"); 
+        newMovie.setTitle("Avengers");
         newMovie.setGenre("Action");
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("A movie with this title already exists", exception.getMessage());
     }
+
     @Test
     void addMovieFailTitleNullTest() {
         Movie newMovie = new Movie();
@@ -141,265 +143,309 @@ class MovieApiTest {
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Title is required and can't be empty", exception.getMessage());
     }
+
     @Test
     void addMovieFailTitleIsEmptyTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle(""); 
+        newMovie.setTitle("");
         newMovie.setGenre("Action");
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Title is required and can't be empty", exception.getMessage());
     }
+
     @Test
     void addMovieFailGenreIsNullTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Genre is required and can't be empty", exception.getMessage());
     }
+
     @Test
     void addMovieFailGenreIsEmptyTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setGenre("");
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Genre is required and can't be empty", exception.getMessage());
     }
+
     @Test
     void addMovieFailGenreContainsNumbersTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setGenre("Ac3ti4on");
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Genre can't contain numbers", exception.getMessage());
     }
+
     @Test
     void addMovieFailDurationIsNullTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setGenre("Action");
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Duration must be greater than 0", exception.getMessage());
     }
+
     @Test
     void addMovieFailNegativeDurationTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setGenre("Action");
         newMovie.setDuration(-20);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Duration must be greater than 0", exception.getMessage());
     }
+
     @Test
     void addMovieFailNegativeRatingTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setGenre("Action");
         newMovie.setDuration(130);
         newMovie.setRating(-5.0);
         newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Rating must be greater than 0", exception.getMessage());
     }
+
     @Test
     void addMovieFailReleaseYearIsNullTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setGenre("Action");
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Release year is required and must be greater than 0", exception.getMessage());
     }
+
     @Test
     void addMovieFailNegativeReleaseYearTest() {
         Movie newMovie = new Movie();
         newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
+        newMovie.setTitle("Spider-Man");
         newMovie.setGenre("Action");
         newMovie.setDuration(130);
         newMovie.setRating(10.0);
         newMovie.setReleaseYear(-5);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
+
+        when(movieRepository.save(newMovie))
+                .thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             movieService.addMovie(newMovie);
         });
-    
+
         assertEquals("Release year is required and must be greater than 0", exception.getMessage());
     }
+
     @Test
     void updateMovieSuccessfullTest() {
-        Movie newMovie = new Movie();
-        newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
-        newMovie.setGenre("Action");
-        newMovie.setDuration(130);
-        newMovie.setRating(10.0);
-        newMovie.setReleaseYear(2021);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            movieService.addMovie(newMovie);
-        });
-    
-        assertEquals("Release year is required and must be greater than 0", exception.getMessage());
-    }
-    @Test
-    void updateMovieFailNonExistingTitleTest() {
-        Movie newMovie = new Movie();
-        newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
-        newMovie.setGenre("Action");
-        newMovie.setDuration(130);
-        newMovie.setRating(10.0);
-        newMovie.setReleaseYear(-5);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            movieService.addMovie(newMovie);
-        });
-    
-        assertEquals("Release year is required and must be greater than 0", exception.getMessage());
-    }
-    @Test
-    void addMovieFailNegativeReleaseYearTest() {
-        Movie newMovie = new Movie();
-        newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
-        newMovie.setGenre("Action");
-        newMovie.setDuration(130);
-        newMovie.setRating(10.0);
-        newMovie.setReleaseYear(-5);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            movieService.addMovie(newMovie);
-        });
-    
-        assertEquals("Release year is required and must be greater than 0", exception.getMessage());
-    }
-    @Test
-    void addMovieFailNegativeReleaseYearTest() {
-        Movie newMovie = new Movie();
-        newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
-        newMovie.setGenre("Action");
-        newMovie.setDuration(130);
-        newMovie.setRating(10.0);
-        newMovie.setReleaseYear(-5);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            movieService.addMovie(newMovie);
-        });
-    
-        assertEquals("Release year is required and must be greater than 0", exception.getMessage());
-    }
-    @Test
-    void addMovieFailNegativeReleaseYearTest() {
-        Movie newMovie = new Movie();
-        newMovie.setId(3L);
-        newMovie.setTitle("Spider-Man"); 
-        newMovie.setGenre("Action");
-        newMovie.setDuration(130);
-        newMovie.setRating(10.0);
-        newMovie.setReleaseYear(-5);
-    
-        when(movieRepository.save(newMovie)).thenThrow(new DataIntegrityViolationException("A movie with this title already exists"));
-    
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            movieService.addMovie(newMovie);
-        });
-    
-        assertEquals("Release year is required and must be greater than 0", exception.getMessage());
-    }
-    
+        // Create a new Movie object with updated details
+        Movie updatedMovie = new Movie();
+        updatedMovie.setId(2L); // Set the correct ID
+        updatedMovie.setTitle("Spider-Man");
+        updatedMovie.setGenre("Action");
+        updatedMovie.setDuration(60);
+        updatedMovie.setRating(10.0);
+        updatedMovie.setReleaseYear(2021);
 
+        when(movieRepository.findByTitle("Endgame")).thenReturn(Optional.of(secondMovie));
+        when(movieRepository.save(updatedMovie)).thenReturn(updatedMovie);
+
+        Movie result = movieService.updateMovie("Endgame", updatedMovie);
+        assertEquals(updatedMovie, result);
+    }
+
+    @Test
+    void updateFailMovieNonExistingMovieTest() {
+        Movie updatedMovie = new Movie();
+        updatedMovie.setId(2L);
+        updatedMovie.setTitle("Spider-Man");
+        updatedMovie.setGenre("Action");
+        updatedMovie.setDuration(60);
+        updatedMovie.setRating(10.0);
+        updatedMovie.setReleaseYear(2021);
+
+        when(movieRepository.findByTitle("Deadpool")).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            movieService.updateMovie("Deadpool", updatedMovie);
+        });
+
+        assertEquals("There is no movie with the given title 'Deadpool'", exception.getMessage());
+    }
+
+    @Test
+    void updateFailMovieTitleEmptyTest() {
+        Movie updatedMovie = new Movie();
+        updatedMovie.setId(2L);
+        updatedMovie.setTitle("");
+        updatedMovie.setGenre("Action");
+        updatedMovie.setDuration(60);
+        updatedMovie.setRating(10.0);
+        updatedMovie.setReleaseYear(2021);
+
+        when(movieRepository.findByTitle("Endgame")).thenReturn(Optional.of(secondMovie));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            movieService.updateMovie("Endgame", updatedMovie);
+        });
+
+        assertEquals("Title can't be empty", exception.getMessage());
+    }
+
+    @Test
+    void updateFailTitleAlreadyTakenTest() {
+        Movie updatedMovie = new Movie();
+        updatedMovie.setId(2L);
+        updatedMovie.setTitle("Avengers");
+        updatedMovie.setGenre("Action");
+        updatedMovie.setDuration(60);
+        updatedMovie.setRating(10.0);
+        updatedMovie.setReleaseYear(2021);
+
+        when(movieRepository.findByTitle("Endgame")).thenReturn(Optional.of(secondMovie));
+        when(movieRepository.findByTitle("Avengers")).thenReturn(Optional.of(movie));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            movieService.updateMovie("Endgame", updatedMovie);
+        });
+
+        assertEquals("The updated title is already taken", exception.getMessage());
+    }
+
+    @Test
+    void updateFailShowTimeNotLongEnoughTest() {
+        Movie updatedMovie = new Movie();
+        updatedMovie.setId(2L); 
+        updatedMovie.setTitle("Endgame");
+        updatedMovie.setGenre("Action");
+        updatedMovie.setDuration(300); 
+        updatedMovie.setRating(10.0);
+        updatedMovie.setReleaseYear(2021);
+
+       
+        when(movieRepository.findByTitle("Endgame")).thenReturn(Optional.of(secondMovie));
+        when(showTimeRepository.findByMovieId(2L)).thenReturn(Arrays.asList(showTime));
+
+        
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            movieService.updateMovie("Endgame", updatedMovie);
+        });
+
+        assertEquals("The duration of showtime: 1 is too short for the updated movie's duration and needs to be extended", exception.getMessage());
+    }
+    @Test
+    void deleteMovieTest() {
+        // Mock the repository methods to return the existing movie when queried by title
+        when(movieRepository.findByTitle(movie.getTitle())).thenReturn(Optional.of(movie));
+        when(movieRepository.existsById(movie.getId())).thenReturn(true);
     
+        // Call the deleteMovieByTitle method to delete the movie
+        movieService.deleteMovieByTitle(movie.getTitle());
+    
+        verify(movieRepository, times(1)).delete(movie);
+    
+        when(movieRepository.findByTitle(movie.getTitle())).thenReturn(Optional.empty());
+        when(movieRepository.existsById(movie.getId())).thenReturn(false);
+    
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            movieService.deleteMovieByTitle(movie.getTitle());
+        });
+    
+        assertEquals("There is no movie with the given title 'Avengers'", exception.getMessage());
+    }
 }
