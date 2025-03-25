@@ -21,10 +21,11 @@ public class BookingService {
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
-    
+
     public Booking createBooking(Booking booking) {
         validateBooking(booking);
-        Optional<Booking> existingBooking = bookingRepository.findByShowtimeIdAndSeatNumber(booking.getShowtimeId(), booking.getSeatNumber());
+        Optional<Booking> existingBooking = bookingRepository.findByShowtimeIdAndSeatNumber(booking.getShowtimeId(),
+                booking.getSeatNumber());
         if (existingBooking.isPresent()) {
             throw new DataIntegrityViolationException("The selected seat is already taken for this showtime");
         }
@@ -32,11 +33,12 @@ public class BookingService {
     }
 
     private void validateBooking(Booking booking) {
-        if (booking.getShowtimeId() == null || booking.getShowtimeId() <= 0) {  
+        if (booking.getShowtimeId() == null || booking.getShowtimeId() <= 0) {
             throw new IllegalArgumentException("Showtime ID is required and must be a valid number greater than 0");
         }
         if (!showTimeRepository.existsById(booking.getShowtimeId())) {
-            throw new IllegalArgumentException("There is no showtime with the given showtimeId: " + booking.getShowtimeId());
+            throw new IllegalArgumentException(
+                    "There is no showtime with the given showtimeId: " + booking.getShowtimeId());
         }
         if (booking.getSeatNumber() == null || booking.getSeatNumber() <= 0) {
             throw new IllegalArgumentException("Seat number is required and must be greater than 0");

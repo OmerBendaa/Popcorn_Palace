@@ -1,4 +1,5 @@
 package com.att.tdp.popcorn_palace.model;
+
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -10,7 +11,7 @@ import lombok.Data;
 @Data
 @Entity
 public class Booking {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
