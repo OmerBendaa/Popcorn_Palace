@@ -16,10 +16,10 @@ public class ShowTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private Long movieId;
     private String theater;
-    private Instant  startTime;
-    private Instant  endTime;
+    private Instant startTime;
+    private Instant endTime;
     private Double price;
 }

@@ -12,6 +12,7 @@ import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+
 @Service
 public class MovieService {
 
@@ -22,23 +23,24 @@ public class MovieService {
     @Autowired
     private ShowTimeService showTimeService;
 
-    public List<Movie> getAllMovies(){
+    public List<Movie> getAllMovies() {
         return movieRepository.findAll();
     }
 
-    public Movie addMovie(Movie movie){
+    public Movie addMovie(Movie movie) {
         validateMovie(movie);
-        try{ 
+        try {
             return movieRepository.save(movie);
-        }catch(DataIntegrityViolationException error){
+        } catch (DataIntegrityViolationException error) {
             throw new DataIntegrityViolationException("A movie with this title already exists");
         }
-    } 
+    }
 
-    public Movie updateMovie(String title,Movie updatedMovie){
-        Movie existingMovie=movieRepository.findByTitle(title).orElseThrow(()-> new NotFoundException("There is no movie with the given title '"+title+"'"));
-        Integer existingMovieDuration=existingMovie.getDuration();
-        if(updatedMovie.getTitle()!=null && updatedMovie.getTitle().trim().isEmpty()){
+    public Movie updateMovie(String title, Movie updatedMovie) {
+        Movie existingMovie = movieRepository.findByTitle(title)
+                .orElseThrow(() -> new NotFoundException("There is no movie with the given title '" + title + "'"));
+        Integer movieBeforeUpdateDuration = existingMovie.getDuration();
+        if (updatedMovie.getTitle() != null && updatedMovie.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Title can't be empty");
         }
         if (updatedMovie.getTitle() != null && !updatedMovie.getTitle().trim().isEmpty()) {
@@ -54,57 +56,59 @@ public class MovieService {
             }
             existingMovie.setGenre(updatedMovie.getGenre());
         }
-    
+
         if (updatedMovie.getDuration() != null && updatedMovie.getDuration() > 0) {
             existingMovie.setDuration(updatedMovie.getDuration());
         }
-    
+
         if (updatedMovie.getRating() != null && updatedMovie.getRating() >= 0) {
             existingMovie.setRating(updatedMovie.getRating());
         }
-    
+
         if (updatedMovie.getReleaseYear() != null && updatedMovie.getReleaseYear() > 0) {
             existingMovie.setReleaseYear(updatedMovie.getReleaseYear());
         }
-        if(existingMovieDuration<existingMovie.getDuration()){
+        if (movieBeforeUpdateDuration < existingMovie.getDuration()) {
             List<ShowTime> relatedShowTimes = showTimeRepository.findByMovieId(existingMovie.getId());
-            for(ShowTime showTime:relatedShowTimes){
-                 Duration showTimeDuration = Duration.between(showTime.getStartTime(), showTime.getEndTime());
-            if (showTimeDuration.toMinutes() < existingMovie.getDuration()) {
-                throw new IllegalArgumentException("The duration of showtime: "+showTime.getId()+" is too short for the updated movie's duration and needs to be extended");
-            }
+            for (ShowTime showTime : relatedShowTimes) {
+                Duration showTimeDuration = Duration.between(showTime.getStartTime(), showTime.getEndTime());
+                if (showTimeDuration.toMinutes() < existingMovie.getDuration()) {
+                    throw new IllegalArgumentException("The duration of showtime: " + showTime.getId()
+                            + " is too short for the updated movie's duration and needs to be extended");
+                }
             }
         }
-    
+
         return movieRepository.save(existingMovie);
     }
 
-    public void deleteMovieByTitle(String title){
-        Movie movie=movieRepository.findByTitle(title).orElseThrow(()->new NotFoundException("There is no movie with the given title '"+title+"'"));
+    public void deleteMovieByTitle(String title) {
+        Movie movie = movieRepository.findByTitle(title)
+                .orElseThrow(() -> new NotFoundException("There is no movie with the given title '" + title + "'"));
         List<ShowTime> relatedShowTimes = showTimeRepository.findByMovieId(movie.getId());
-        for(ShowTime showTime:relatedShowTimes){
+        for (ShowTime showTime : relatedShowTimes) {
             showTimeService.deleteShowTimeById(showTime.getId());
         }
         movieRepository.delete(movie);
-    } 
-    
-    private void validateMovie(Movie movie){
-        if(movie.getTitle()==null||movie.getTitle().trim().isEmpty()){
+    }
+
+    private void validateMovie(Movie movie) {
+        if (movie.getTitle() == null || movie.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Title is required and can't be empty");
         }
-        if(movie.getGenre()==null||movie.getGenre().trim().isEmpty()){
+        if (movie.getGenre() == null || movie.getGenre().trim().isEmpty()) {
             throw new IllegalArgumentException("Genre is required and can't be empty");
         }
-        if(movie.getGenre().matches(".*\\d.*")){
+        if (movie.getGenre().matches(".*\\d.*")) {
             throw new IllegalArgumentException("Genre can't contain numbers");
         }
-        if(movie.getDuration()==null||movie.getDuration()<=0){
+        if (movie.getDuration() == null || movie.getDuration() <= 0) {
             throw new IllegalArgumentException("Duration must be greater than 0");
         }
-        if(movie.getRating()<0){
+        if (movie.getRating() < 0) {
             throw new IllegalArgumentException("Rating must be greater than 0");
         }
-        if(movie.getReleaseYear()==null||movie.getReleaseYear()<0){
+        if (movie.getReleaseYear() == null || movie.getReleaseYear() < 0) {
             throw new IllegalArgumentException("Release year is required and must be greater than 0");
         }
     }

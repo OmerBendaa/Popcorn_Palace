@@ -20,7 +20,7 @@ public class BookingController {
     public ResponseEntity<List<Booking>> getAllBookings() {
         return ResponseEntity.status(HttpStatus.OK).body(bookingService.getAllBookings());
     }
-    
+
     @PostMapping
     public ResponseEntity<Map<String, String>> createBooking(@RequestBody Booking booking) {
         Booking savedBooking = bookingService.createBooking(booking);
