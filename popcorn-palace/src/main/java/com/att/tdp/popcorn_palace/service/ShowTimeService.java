@@ -11,11 +11,14 @@ import com.att.tdp.popcorn_palace.repository.IBookingRepository;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ShowTimeService {
     @Autowired
@@ -26,15 +29,19 @@ public class ShowTimeService {
     private IBookingRepository bookingRepository;
 
     public List<ShowTime> getAllShowTimes() {
+        log.info("#getAllShowTimes started");
         return showTimeRepository.findAll();
     }
 
     public ShowTime getShowTimeById(Long showtimeId) {
+        log.info("#getShowTimeById started");
         return showTimeRepository.findById(showtimeId)
                 .orElseThrow(() -> new NotFoundException("There is no showtime with the given id: " + showtimeId));
     }
 
     public ShowTime addShowTime(ShowTime showTime) {
+        log.info("#addShowTime started");
+
         validateShowTime(showTime);
         List<ShowTime> overlappingShowTimes = showTimeRepository.findOverlappingShowTimes(
                 showTime.getTheater(), showTime.getStartTime(), showTime.getEndTime());
@@ -46,6 +53,7 @@ public class ShowTimeService {
     }
 
     public void updateShowTime(Long showTimeId, ShowTime updatedShowTime) {
+        log.info("#updateShowTime started");
         ShowTime existingShowTime = showTimeRepository.findById(showTimeId)
                 .orElseThrow(
                         () -> new NotFoundException("There is no showTime with the given Id '" + showTimeId + "'"));
@@ -94,16 +102,18 @@ public class ShowTimeService {
                 && overlappingShowTimes.stream().anyMatch(foundShowTime -> !foundShowTime.getId().equals(showTimeId))) {
             throw new DataIntegrityViolationException("The updated showTime overlaps with an existing showTime");
         }
-
+        log.info("#updateShowTime >> Updated ShowTime: {}", existingShowTime);
         showTimeRepository.save(existingShowTime);
     }
 
     public void deleteShowTimeById(Long showTimeId) {
+        log.info("#deleteShowTimeById started");
         ShowTime showTime = showTimeRepository.findById(showTimeId).orElseThrow(
                 () -> new NotFoundException("There is no showTime with the given id '" + showTimeId + "'"));
         List<Booking> showTimeBookings = bookingRepository.findByShowtimeId(showTimeId);
         bookingRepository.deleteAll(showTimeBookings);
         showTimeRepository.delete(showTime);
+        log.info("#deleteShowTimeById >> ShowTime Was Successfully Deleted");
     }
 
     private void validateShowTime(ShowTime showTime) {

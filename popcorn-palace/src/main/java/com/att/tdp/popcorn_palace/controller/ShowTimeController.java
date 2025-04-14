@@ -2,6 +2,9 @@ package com.att.tdp.popcorn_palace.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import com.att.tdp.popcorn_palace.service.ShowTimeService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import com.att.tdp.popcorn_palace.model.ShowTime;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/showtimes")
 public class ShowTimeController {
@@ -22,30 +26,37 @@ public class ShowTimeController {
 
     @GetMapping("/all")
     public ResponseEntity<List<ShowTime>> getAllShowTimes() {
+        log.info("#getAllShowTimes");
         List<ShowTime> showTimes = showTimeService.getAllShowTimes();
         return ResponseEntity.status(HttpStatus.OK).body(showTimes);
     }
 
     @GetMapping("/{showtimeId}")
     public ResponseEntity<ShowTime> getShowTimeById(@PathVariable Long showtimeId) {
+        log.info("#getShowTimeById >> By Id: {}",showtimeId);
         ShowTime showTime = showTimeService.getShowTimeById(showtimeId);
+        log.info("#getShowTimeById >> ShowTime: {}",showTime);
         return ResponseEntity.status(HttpStatus.OK).body(showTime);
     }
 
     @PostMapping
     public ResponseEntity<ShowTime> addShowTime(@RequestBody ShowTime showTime) {
+        log.info("#addShowTime: {}",showTime);
         ShowTime addedShowTime = showTimeService.addShowTime(showTime);
+        log.info("#addShowTime: Added ShowTime: {}",addedShowTime);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedShowTime);
     }
 
     @PostMapping("/update/{showtimeId}")
     public ResponseEntity<Void> updateShowTime(@PathVariable Long showtimeId, @RequestBody ShowTime updatedShowTime) {
+        log.info("#updateShowTime >> By Id: {}",showtimeId);
         showTimeService.updateShowTime(showtimeId, updatedShowTime);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/{showtimeId}")
     public ResponseEntity<Void> deleteShowTimeById(@PathVariable Long showtimeId) {
+        log.info("#deleteShowTimeById >> By Id: {}",showtimeId);
         showTimeService.deleteShowTimeById(showtimeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

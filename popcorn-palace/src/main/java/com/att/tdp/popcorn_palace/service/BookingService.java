@@ -3,13 +3,16 @@ package com.att.tdp.popcorn_palace.service;
 import com.att.tdp.popcorn_palace.model.Booking;
 import com.att.tdp.popcorn_palace.repository.IBookingRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+@Slf4j
 @Service
 public class BookingService {
     @Autowired
@@ -19,10 +22,12 @@ public class BookingService {
     private IShowTimeRepository showTimeRepository;
 
     public List<Booking> getAllBookings() {
+        log.info("#getAllBookings started");
         return bookingRepository.findAll();
     }
 
     public Booking createBooking(Booking booking) {
+        log.info("#createBooking started");
         validateBooking(booking);
         Optional<Booking> existingBooking = bookingRepository.findByShowtimeIdAndSeatNumber(booking.getShowtimeId(),
                 booking.getSeatNumber());

@@ -8,11 +8,12 @@ import com.att.tdp.popcorn_palace.model.Movie;
 import com.att.tdp.popcorn_palace.model.ShowTime;
 import com.att.tdp.popcorn_palace.repository.IMovieRepository;
 import com.att.tdp.popcorn_palace.repository.IShowTimeRepository;
-
+import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class MovieService {
 
@@ -28,6 +29,7 @@ public class MovieService {
     }
 
     public Movie addMovie(Movie movie) {
+        log.info("#addMovie started");
         validateMovie(movie);
         try {
             return movieRepository.save(movie);
@@ -37,6 +39,7 @@ public class MovieService {
     }
 
     public Movie updateMovie(String title, Movie updatedMovie) {
+        log.info("#updateMovie started");
         Movie existingMovie = movieRepository.findByTitle(title)
                 .orElseThrow(() -> new NotFoundException("There is no movie with the given title '" + title + "'"));
         Integer movieBeforeUpdateDuration = existingMovie.getDuration();
@@ -78,11 +81,11 @@ public class MovieService {
                 }
             }
         }
-
         return movieRepository.save(existingMovie);
     }
 
     public void deleteMovieByTitle(String title) {
+        log.info("#deleteMovieByTitle started");
         Movie movie = movieRepository.findByTitle(title)
                 .orElseThrow(() -> new NotFoundException("There is no movie with the given title '" + title + "'"));
         List<ShowTime> relatedShowTimes = showTimeRepository.findByMovieId(movie.getId());
@@ -90,6 +93,7 @@ public class MovieService {
             showTimeService.deleteShowTimeById(showTime.getId());
         }
         movieRepository.delete(movie);
+        log.info("#deleteMovieByTitle >> Movie deleted Succesfully: {}", title);
     }
 
     private void validateMovie(Movie movie) {
